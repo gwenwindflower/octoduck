@@ -1,0 +1,7 @@
+modal
+typer[all]
+duckdb
+requests
+tqdm
+halo
+setuptools
