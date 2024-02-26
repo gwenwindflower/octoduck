@@ -6,6 +6,7 @@ env
 data
 *.db
 *.ddb
+*.db.wal
 
 .DS_Store
 *.swp
