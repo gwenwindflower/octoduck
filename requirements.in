@@ -5,3 +5,4 @@ requests
 tqdm
 halo
 setuptools
+boto3

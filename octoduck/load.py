@@ -14,12 +14,7 @@ def load_data(prod: bool = False):
     data_path = f"{cwd}/data/"
     db_file_path = typer.prompt("❓Where do you want your db file built?")
 
-    if prod:
-        # You must have a MOTHERDUCK_TOKEN environment variable set for this to work
-        connection = "md:"
-        # s3
-    else:
-        connection = f"{db_file_path}/octocatalog.db"
+    connection = f"{db_file_path}/octocatalog.db"
 
     con = duckdb.connect(database=connection, read_only=False)
     con.sql(
@@ -46,12 +41,19 @@ def load_data(prod: bool = False):
                 """
             )
     if prod:
+        bucket = typer.prompt("❓What is your S3 bucket named?")
         con.sql(
-            """
-            copy raw.github_events 
-            to github_events 
+            f"""
+            install aws;
+            install httpfs;
+            load aws;
+            load httpfs;
+            call load_aws_credentials();
+            copy raw.github_events
+            to 's3://{bucket}/github-events'
             (
-                format parquet, partition by (
+                format parquet,
+                partition by (
                     event_at_year,
                     event_at_month
                 )
