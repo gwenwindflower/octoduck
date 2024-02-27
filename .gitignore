@@ -6,6 +6,7 @@ env
 data
 *.db
 *.ddb
+*.db.tmp
 *.db.wal
 
 .DS_Store

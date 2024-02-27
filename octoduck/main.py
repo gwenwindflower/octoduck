@@ -80,7 +80,6 @@ def load():
 @app.command()
 def prod(start: str = "", end: str = ""):
 
-    db_file_path = typer.prompt("❓Where do you want your db file built?", ".")
     bucket_name = typer.prompt("❓What is your S3 bucket named?", "github-events")
 
     active_datetime, end_datetime, total_files = get_time_range(start, end)
@@ -88,10 +87,6 @@ def prod(start: str = "", end: str = ""):
     with Progress() as progress_bar:
         task_extract = progress_bar.add_task(
             extract_description,
-            total=total_files,
-        )
-        task_load = progress_bar.add_task(
-            load_description,
             total=total_files,
         )
         task_write = progress_bar.add_task(
@@ -103,14 +98,10 @@ def prod(start: str = "", end: str = ""):
             downloaded_file_path = extract_data(active_datetime)
             progress_bar.update(task_extract, advance=1)
 
-            # load
-            load_data(db_file_path, downloaded_file_path)
-            progress_bar.update(task_load, advance=1)
-            os.remove(downloaded_file_path)
-
             # write
-            write_data(db_file_path, bucket_name)
+            write_data(downloaded_file_path, bucket_name)
             progress_bar.update(task_write, advance=1)
+            # os.remove(downloaded_file_path)
 
             active_datetime += timedelta(hours=1)
 

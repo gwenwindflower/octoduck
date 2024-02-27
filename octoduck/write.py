@@ -1,28 +1,14 @@
-import duckdb
+import pyarrow.fs as fs
+import pyarrow.parquet as pq
+from pyarrow import json
 
 
-def write_data(db_file_path: str = ".", bucket_name: str = "github-events"):
-    connection = f"{db_file_path}/octocatalog.db"
-
-    con = duckdb.connect(database=connection, read_only=False)
-    con.sql(
-        f"""
-        install aws;
-        install httpfs;
-        load aws;
-        load httpfs;
-        call load_aws_credentials('default');
-        copy raw.github_events
-        to 's3://{bucket_name}'
-        (
-            format parquet,
-            partition_by (
-                event_at_year,
-                event_at_month
-            ),
-            overwrite_or_ignore,
-            FILENAME_PATTERN \"data_{{i}}\"
-        );
-        """
+def write_data(downloaded_file_path: str, bucket_name: str = "github-events"):
+    table = json.read_json(downloaded_file_path)
+    s3 = fs.FileSystem.from_uri(f"s3://{bucket_name}")
+    pq.write_to_dataset(
+        table,
+        root_path="github-events",
+        partition_cols=["year", "month"],
+        filesystem=s3,
     )
-    con.close()
