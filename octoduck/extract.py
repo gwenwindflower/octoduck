@@ -18,7 +18,7 @@ def get_url_file_path(active_datetime):
 
 def download_data(active_datetime):
     url, file_path = get_url_file_path(active_datetime)
-    uncompressed_file_path = os.path.splitext(file_path)[0] + ".json"
+    uncompressed_file_path: str = os.path.splitext(file_path)[0] + ".json"
     if not os.path.exists(file_path):
         response = requests.get(url, stream=True)
 
@@ -28,7 +28,8 @@ def download_data(active_datetime):
             with gzip.open(file_path, "rb") as file_in:
                 with open(uncompressed_file_path, "wb") as file_out:
                     shutil.copyfileobj(file_in, file_out)
-                    return uncompressed_file_path
+
+    return uncompressed_file_path
 
 
 def extract_data(
@@ -37,6 +38,6 @@ def extract_data(
     if not os.path.exists("./data"):
         os.makedirs("./data")
 
-    file_path = download_data(active_datetime)
+    file_path: str = download_data(active_datetime)
 
     return file_path

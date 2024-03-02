@@ -1,3 +1,5 @@
+import pyarrow as pa
+
 columns_def = """
     id VARCHAR PRIMARY KEY,
     type VARCHAR,
@@ -60,3 +62,40 @@ columns = """
         )'
     }
 """
+
+pa_schema = [
+    ("id", pa.string()),
+    ("type", pa.string()),
+    (
+        "actor",
+        pa.struct(
+            [
+                ("id", pa.int64()),
+                ("login", pa.string()),
+                ("display_login", pa.string()),
+                ("gravatar_id", pa.string()),
+                ("url", pa.string()),
+                ("avatar_url", pa.string()),
+            ]
+        ),
+    ),
+    (
+        "repo",
+        pa.struct([("id", pa.int64()), ("name", pa.string()), ("url", pa.string())]),
+    ),
+    ("payload", pa.string()),
+    ("public", pa.bool_()),
+    ("created_at", pa.timestamp("s")),
+    (
+        "org",
+        pa.struct(
+            [
+                ("id", pa.string()),
+                ("login", pa.string()),
+                ("gravatar_id", pa.string()),
+                ("url", pa.string()),
+                ("avatar_url", pa.string()),
+            ]
+        ),
+    ),
+]

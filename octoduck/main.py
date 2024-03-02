@@ -95,13 +95,12 @@ def prod(start: str = "", end: str = ""):
         )
         while active_datetime <= end_datetime:
             # extract
-            downloaded_file_path = extract_data(active_datetime)
+            downloaded_file_path: str = extract_data(active_datetime)
             progress_bar.update(task_extract, advance=1)
 
             # write
             write_data(downloaded_file_path, bucket_name)
             progress_bar.update(task_write, advance=1)
-            # os.remove(downloaded_file_path)
 
             active_datetime += timedelta(hours=1)
 
